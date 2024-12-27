@@ -14,15 +14,19 @@ import { useSubtitleStore } from "@/lib/store/subtitles";
 import { useCallback, useState } from "react";
 import { useDebounceCallback } from "@/lib/hooks/useDebounceCallback";
 import type { Subtitle } from "@/lib/types/subtitle";
+import { parseTimestamp } from "@/lib/utils/time";
+import { cn } from "@/lib/utils";
 
 interface TranscriptionTableProps {
   subtitles: Subtitle[];
-  onSubtitlesChange?: (subtitles: Subtitle[], startTime?: string) => void;
+  onSubtitlesChange?: (subtitles: Subtitle[]) => void;
+  onTimeClick?: (timeInSeconds: number) => void;
 }
 
 export default function TranscriptionTable({
   subtitles, 
-  onSubtitlesChange 
+  onSubtitlesChange,
+  onTimeClick
 }: TranscriptionTableProps) {
   const updateSubtitle = useSubtitleStore((state) => state.updateSubtitle);
   const [lastEditedIndex, setLastEditedIndex] = useState<number | null>(null);
@@ -30,9 +34,14 @@ export default function TranscriptionTable({
   const debouncedSeek = useDebounceCallback((index: number) => {
     const currentSubtitles = useSubtitleStore.getState().present;
     if (currentSubtitles[index]) {
-      onSubtitlesChange?.(currentSubtitles, currentSubtitles[index].startTime);
+      onSubtitlesChange?.(currentSubtitles);
     }
   }, 250);
+
+  const handleTimeClick = useCallback((time: string) => {
+    const timeInSeconds = parseTimestamp(time);
+    onTimeClick?.(timeInSeconds);
+  }, [onTimeClick]);
   
   const handleTextChange = useCallback((index: number, newText: string) => {
     setLastEditedIndex(index);
@@ -45,16 +54,34 @@ export default function TranscriptionTable({
       <Table>
         <TableHeader>
           <TableRow>
-            <TableHead className="w-[100px]">Start Time</TableHead>
-            <TableHead className="w-[100px]">End Time</TableHead>
+            <TableHead className="w-[100px]" title="Click to seek">Start Time</TableHead>
+            <TableHead className="w-[100px]" title="Click to seek">End Time</TableHead>
             <TableHead>Text</TableHead>
           </TableRow>
         </TableHeader>
         <TableBody>
           {subtitles?.map((subtitle, index) => (
             <TableRow key={index}>
-              <TableCell>{subtitle.startTime}</TableCell>
-              <TableCell>{subtitle.endTime}</TableCell>
+              <TableCell
+                onClick={() => handleTimeClick(subtitle.startTime)}
+                className={cn(
+                  "cursor-pointer hover:text-primary transition-colors",
+                  "select-none"
+                )}
+                title="Click to seek"
+              >
+                {subtitle.startTime}
+              </TableCell>
+              <TableCell
+                onClick={() => handleTimeClick(subtitle.endTime)}
+                className={cn(
+                  "cursor-pointer hover:text-primary transition-colors",
+                  "select-none"
+                )}
+                title="Click to seek"
+              >
+                {subtitle.endTime}
+              </TableCell>
               <TableCell>
                 <Input
                   value={subtitle.text}
