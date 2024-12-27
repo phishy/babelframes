@@ -4,7 +4,7 @@ BabelFrames is a modern web application for video transcription and translation,
 
 ## Features
 
-- **Automatic Transcription**: Extracts speech from video and converts it to text using AWS Transcribe.
+- **Automatic Transcription**: Extracts speech from video and converts it to text using AWS Transcribe, then processes the transcription through ChatGPT to fix errors and improve accuracy.
 - **Translation Support**: Easily translate transcriptions into multiple languages.
 - **Interactive UI**: User-friendly interface for managing and editing transcription timelines.
 - **Undo/Redo Support**: Allows you to undo or redo changes, with state stored in localStorage for persistence.
@@ -82,7 +82,7 @@ To deploy BabelFrames to a production environment:
 ## Architecture
 
 - **Frontend**: Built with [Next.js](https://nextjs.org/) for server-side rendering and fast client-side transitions.
-- **Backend**: Integrates AWS Transcribe for speech-to-text processing.
+- **Backend**: Integrates AWS Transcribe for speech-to-text processing, followed by ChatGPT for error correction and enhancements.
 - **Storage**: Utilizes AWS S3 for storing video files and transcription data.
 
 ## Contributing
@@ -98,6 +98,7 @@ This project is licensed under the MIT License. See the `LICENSE` file for detai
 - [Next.js](https://nextjs.org/)
 - [AWS Transcribe](https://aws.amazon.com/transcribe/)
 - [AWS S3](https://aws.amazon.com/s3/)
+- [ChatGPT](https://openai.com/chatgpt)
 
 ---
 
