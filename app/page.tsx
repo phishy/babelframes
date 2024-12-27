@@ -24,6 +24,17 @@ export default function Home() {
     setSubtitles: state.setSubtitles,
   }));
 
+  const handleSeek = (timeInSeconds: number) => {
+    if (videoRef.current) {
+      videoRef.current.currentTime = timeInSeconds;
+      
+      // Only play if the video is loaded
+      if (videoRef.current.readyState >= 2) {
+        videoRef.current.play().catch(console.error);
+      }
+    }
+  };
+
   const handleGetPresignedUrl = async () => {
     if (!s3Url) return;
     
@@ -61,21 +72,10 @@ export default function Home() {
     }
   };
 
-  const handleSubtitlesChange = (updatedSubtitles: Subtitle[], startTime?: string) => {
+  const handleSubtitlesChange = (updatedSubtitles: Subtitle[]) => {
     if (!updatedSubtitles) return;
     
     setSubtitles(updatedSubtitles);
-    
-    if (startTime && videoRef.current) {
-      const timeInSeconds = parseTimestamp(startTime);
-      
-      videoRef.current.currentTime = timeInSeconds;
-      
-      // Only play if the video is loaded
-      if (videoRef.current.readyState >= 2) {
-        videoRef.current.play().catch(console.error);
-      }
-    }
   };
 
   return (
@@ -138,6 +138,7 @@ export default function Home() {
             <TranscriptionTable 
               subtitles={transcription} 
               onSubtitlesChange={handleSubtitlesChange}
+              onTimeClick={handleSeek}
             />
           </div>
         </div>
