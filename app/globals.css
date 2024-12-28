@@ -57,3 +57,16 @@
     @apply bg-background text-foreground;
   }
 }
+
+@keyframes highlight {
+  0% {
+    border-color: hsl(var(--primary));
+  }
+  100% {
+    border-color: hsl(var(--input));
+  }
+}
+
+.animate-highlight {
+  animation: highlight 1s ease-out forwards;
+}
