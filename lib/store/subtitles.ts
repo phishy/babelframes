@@ -7,6 +7,7 @@ interface SubtitleHistoryState {
   past: Subtitle[][];
   present: Subtitle[];
   future: Subtitle[][];
+  lastModifiedIndex: number | null;
 }
 
 interface SubtitleState extends SubtitleHistoryState {
@@ -24,12 +25,14 @@ export const useSubtitleStore = create<SubtitleState>()(
       past: [],
       present: [],
       future: [],
+      lastModifiedIndex: null,
 
       setSubtitles: (subtitles) => {
         set((state) => {
           state.past.push([...state.present]);
           state.present = [...subtitles];
           state.future = [];
+          state.lastModifiedIndex = null;
         });
       },
 
@@ -40,6 +43,7 @@ export const useSubtitleStore = create<SubtitleState>()(
             i === index ? { ...subtitle, text } : subtitle
           );
           state.future = [];
+          state.lastModifiedIndex = index;
         });
       },
 
