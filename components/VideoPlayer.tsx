@@ -29,10 +29,9 @@ const VideoPlayer = forwardRef<HTMLVideoElement, VideoPlayerProps>(
       const videoElement = ref as React.MutableRefObject<HTMLVideoElement>;
       if (videoElement?.current && subtitles?.length) {
         // Remove existing tracks
-        while (videoElement.current.textTracks.length > 0) {
-          const track = videoElement.current.textTracks[0];
-          if (track.mode) track.mode = 'disabled';
-          videoElement.current.removeChild(videoElement.current.getElementsByTagName('track')[0]);
+        const existingTracks = videoElement.current.getElementsByTagName('track');
+        while (existingTracks.length > 0) {
+          videoElement.current.removeChild(existingTracks[0]);
         }
 
         // Create new track
@@ -47,7 +46,13 @@ const VideoPlayer = forwardRef<HTMLVideoElement, VideoPlayerProps>(
         track.src = blobUrl;
 
         videoElement.current.appendChild(track);
-        videoElement.current.textTracks[0].mode = 'showing';
+        
+        // Wait for track to load before setting mode
+        track.addEventListener('load', () => {
+          if (videoElement.current?.textTracks[0]) {
+            videoElement.current.textTracks[0].mode = 'showing';
+          }
+        });
 
         return () => {
           URL.revokeObjectURL(blobUrl);
