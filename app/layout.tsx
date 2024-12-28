@@ -6,8 +6,8 @@ import { ThemeProvider } from "@/components/theme-provider";
 const inter = Inter({ subsets: ['latin'] });
 
 export const metadata: Metadata = {
-  title: 'Subtitle Editor',
-  description: 'Edit and export subtitles in multiple formats',
+  title: 'localframes.ai',
+  description: 'AI video transcription and localization',
 };
 
 export default function RootLayout({
