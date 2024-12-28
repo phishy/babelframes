@@ -34,7 +34,9 @@ export default function TranscriptionTable({
   const debouncedSeek = useDebounceCallback((index: number) => {
     const currentSubtitles = useSubtitleStore.getState().present;
     if (currentSubtitles[index]) {
+      const timeInSeconds = parseTimestamp(currentSubtitles[index].startTime);
       onSubtitlesChange?.(currentSubtitles);
+      onTimeClick?.(timeInSeconds);
     }
   }, 250);
 
