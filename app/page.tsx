@@ -108,7 +108,7 @@ export default function Home() {
               </>
             )}
           </Button>
-          <UndoRedoButtons />
+          <UndoRedoButtons onTimeChange={handleSeek} />
           <TranslateButton 
             subtitles={transcription}
             onTranslate={setSubtitles}
