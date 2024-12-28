@@ -48,26 +48,36 @@ export const useSubtitleStore = create<SubtitleState>()(
       },
 
       undo: () => {
-        const { past, present } = get();
+        const { past, present, lastModifiedIndex } = get();
         if (past.length === 0) return;
 
+        const previous = past[past.length - 1];
+        const changedIndex = present.findIndex((subtitle, i) => 
+          subtitle.text !== previous[i]?.text
+        );
+        
         set((state) => {
-          const previous = state.past[state.past.length - 1];
           state.past = state.past.slice(0, -1);
           state.future = [state.present, ...state.future];
           state.present = previous;
+          state.lastModifiedIndex = changedIndex >= 0 ? changedIndex : null;
         });
       },
 
       redo: () => {
-        const { future } = get();
+        const { future, present } = get();
         if (future.length === 0) return;
-
+        
+        const next = future[0];
+        const changedIndex = next.findIndex((subtitle, i) => 
+          subtitle.text !== present[i]?.text
+        );
+        
         set((state) => {
-          const next = state.future[0];
           state.past = [...state.past, state.present];
           state.future = state.future.slice(1);
           state.present = next;
+          state.lastModifiedIndex = changedIndex >= 0 ? changedIndex : null;
         });
       },
 
