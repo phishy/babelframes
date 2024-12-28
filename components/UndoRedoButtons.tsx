@@ -1,13 +1,32 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useState, useCallback } from "react";
 import { Button } from "@/components/ui/button"; 
 import { Undo2, Redo2 } from "lucide-react";
 import { useSubtitleStore } from "@/lib/store/subtitles";
+import { parseTimestamp } from "@/lib/utils/time";
 
-export default function UndoRedoButtons() {
-  const { undo, redo, canUndo, canRedo } = useSubtitleStore();
+interface UndoRedoButtonsProps {
+  onTimeChange?: (timeInSeconds: number) => void;
+}
+
+export default function UndoRedoButtons({ onTimeChange }: UndoRedoButtonsProps) {
+  const { undo, redo, canUndo, canRedo, present, lastModifiedIndex } = useSubtitleStore();
   const [mounted, setMounted] = useState(false);
+
+  const handleUndo = useCallback(() => {
+    undo();
+    if (lastModifiedIndex !== null && present[lastModifiedIndex]) {
+      onTimeChange?.(parseTimestamp(present[lastModifiedIndex].startTime));
+    }
+  }, [undo, lastModifiedIndex, present, onTimeChange]);
+
+  const handleRedo = useCallback(() => {
+    redo();
+    if (lastModifiedIndex !== null && present[lastModifiedIndex]) {
+      onTimeChange?.(parseTimestamp(present[lastModifiedIndex].startTime));
+    }
+  }, [redo, lastModifiedIndex, present, onTimeChange]);
 
   useEffect(() => {
     setMounted(true);
@@ -31,7 +50,7 @@ export default function UndoRedoButtons() {
       <Button
         variant="outline"
         size="sm"
-        onClick={undo}
+        onClick={handleUndo}
         disabled={!canUndo()}
         title="Undo"
       >
@@ -40,7 +59,7 @@ export default function UndoRedoButtons() {
       <Button
         variant="outline"
         size="sm"
-        onClick={redo}
+        onClick={handleRedo}
         disabled={!canRedo()}
         title="Redo"
       >
