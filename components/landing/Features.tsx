@@ -24,8 +24,8 @@ const features = [
     icon: Layout
   },
   {
-    title: 'Undo/Redo Support',
-    description: 'Allows you to undo or redo changes, with state stored in localStorage for persistence.',
+    title: 'Version History',
+    description: 'Never lose your work. Automatic saves track every change while you edit, letting you instantly restore any previous version with a single click.',
     icon: Undo2
   },
   {
