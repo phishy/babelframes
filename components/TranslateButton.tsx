@@ -7,7 +7,7 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { Button } from "@/components/ui/button";
-import { Languages, Loader2 } from "lucide-react";
+import { Languages, Loader2, X } from "lucide-react";
 import { SUPPORTED_LANGUAGES } from "@/lib/constants/languages";
 import { Input } from "@/components/ui/input";
 import type { Subtitle } from "@/lib/types/subtitle";
@@ -74,13 +74,21 @@ export default function TranslateButton({ subtitles, onTranslate, disabled }: Tr
         </Button>
       </DropdownMenuTrigger>
       <DropdownMenuContent className="w-[200px]">
-        <div className="p-2">
+        <div className="p-2 relative">
           <Input
             placeholder="Search languages..."
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
             className="h-8"
           />
+          {searchQuery && (
+            <button
+              onClick={() => setSearchQuery("")}
+              className="absolute right-4 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground"
+            >
+              <X className="h-4 w-4" />
+            </button>
+          )}
         </div>
         <ScrollArea className="h-[300px]">
         {filteredLanguages.map((language) => (
