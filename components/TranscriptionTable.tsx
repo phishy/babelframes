@@ -11,11 +11,11 @@ import {
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Input } from "@/components/ui/input";
 import { useSubtitleStore } from "@/lib/store/subtitles";
-import { useCallback, useState } from "react";
+import { useCallback, useState, useEffect, useRef } from "react";
 import { useDebounceCallback } from "@/lib/hooks/useDebounceCallback";
 import type { Subtitle } from "@/lib/types/subtitle";
 import { parseTimestamp } from "@/lib/utils/time";
-import { cn } from "@/lib/utils";
+import { cn } from "@/lib/utils"; 
 
 interface TranscriptionTableProps {
   subtitles: Subtitle[];
@@ -29,7 +29,33 @@ export default function TranscriptionTable({
   onTimeClick
 }: TranscriptionTableProps) {
   const updateSubtitle = useSubtitleStore((state) => state.updateSubtitle);
-  const [lastEditedIndex, setLastEditedIndex] = useState<number | null>(null);
+  const lastModifiedIndex = useSubtitleStore((state) => state.lastModifiedIndex);
+  const previousSubtitles = useRef<Subtitle[]>([]);
+  const [changedIndices, setChangedIndices] = useState<number[]>([]);
+  
+  // Reset changed indices after animation
+  useEffect(() => {
+    if (changedIndices.length > 0) {
+      const timer = setTimeout(() => {
+        setChangedIndices([]);
+      }, 1000); // Match animation duration
+      return () => clearTimeout(timer);
+    }
+  }, [changedIndices]);
+  
+  useEffect(() => {
+    if (subtitles && previousSubtitles.current) {
+      const indices = subtitles.reduce((acc: number[], subtitle, index) => {
+        if (subtitle.text !== previousSubtitles.current[index]?.text) {
+          acc.push(index);
+        }
+        return acc;
+      }, []);
+      
+      if (indices.length > 0) setChangedIndices(indices);
+      previousSubtitles.current = [...subtitles];
+    }
+  }, [subtitles]);
   
   const debouncedSeek = useDebounceCallback((index: number) => {
     const currentSubtitles = useSubtitleStore.getState().present;
@@ -46,7 +72,6 @@ export default function TranscriptionTable({
   }, [onTimeClick]);
   
   const handleTextChange = useCallback((index: number, newText: string) => {
-    setLastEditedIndex(index);
     updateSubtitle(index, newText);
     debouncedSeek(index);
   }, [updateSubtitle, onSubtitlesChange]);
@@ -88,7 +113,10 @@ export default function TranscriptionTable({
                 <Input
                   value={subtitle.text}
                   onChange={(e) => handleTextChange(index, e.target.value)}
-                  className="w-full"
+                  className={cn(
+                    "w-full transition-all duration-1000",
+                    (changedIndices.includes(index) || index === lastModifiedIndex) && "border-primary animate-highlight"
+                  )}
                 />
               </TableCell>
             </TableRow>
